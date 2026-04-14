@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "./axios";
 
 export const getUsers = () => api.get("/admin/users");
 export const assignRole = (userId, role) =>
