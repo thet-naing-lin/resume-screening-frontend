@@ -3,8 +3,8 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
+import UserManagement from "./pages/admin/UserManagement";
 
-// Placeholder pages — will be built in next sprints
 const PlaceholderPage = ({ title }) => {
   const DashboardLayout =
     require("./components/layout/DashboardLayout").default;
@@ -12,10 +12,7 @@ const PlaceholderPage = ({ title }) => {
     <DashboardLayout>
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div
-            className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center
-                          justify-center mx-auto mb-4"
-          >
+          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg
               className="w-8 h-8 text-blue-400"
               fill="none"
@@ -57,6 +54,27 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Admin */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute>
+              <UserManagement />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <PlaceholderPage title="User Management" />
+            </ProtectedRoute>
+          }
+        /> */}
+
+        {/* Placeholder routes — will be replaced each sprint */}
         <Route
           path="/jobs"
           element={
@@ -86,14 +104,6 @@ export default function App() {
           element={
             <ProtectedRoute>
               <PlaceholderPage title="Reports & Export" />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="User Management" />
             </ProtectedRoute>
           }
         />

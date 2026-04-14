@@ -202,8 +202,8 @@ export default function Login() {
         {/* Demo credentials hint */}
         <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
           <p className="font-semibold mb-1">Demo Credentials</p>
-          <p>Admin: admin@resume-tool.com / Admin@12345</p>
-          <p>HR: hr@resume-tool.com / Hr@12345</p>
+          <p>Admin: admin@resumescreening.com / Admin@1234</p>
+          {/* <p>HR: hr@resume-tool.com / Hr@12345</p> */}
         </div>
       </div>
     </div>

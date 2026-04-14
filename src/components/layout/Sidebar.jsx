@@ -103,7 +103,7 @@ const hrLinks = [
 // Extra links only for admins
 const adminLinks = [
   {
-    to: "/users",
+    to: "/admin/users",
     label: "User Management",
     icon: (
       <svg
