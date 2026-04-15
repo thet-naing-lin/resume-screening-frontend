@@ -4,6 +4,9 @@ import Register from "./pages/auth/Register";
 import Dashboard from "./pages/dashboard/Dashboard";
 import ProtectedRoute from "./components/layout/ProtectedRoute";
 import UserManagement from "./pages/admin/UserManagement";
+import JobList from "./pages/jobs/JobList";
+import CreateJob from "./pages/jobs/CreateJob";
+import EditJob from "./pages/jobs/EditJob";
 
 const PlaceholderPage = ({ title }) => {
   const DashboardLayout =
@@ -65,24 +68,33 @@ export default function App() {
           }
         />
 
-        {/* <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="User Management" />
-            </ProtectedRoute>
-          }
-        /> */}
-
-        {/* Placeholder routes — will be replaced each sprint */}
+        {/* Jobs — US-003, US-004, US-005 */}
         <Route
           path="/jobs"
           element={
             <ProtectedRoute>
-              <PlaceholderPage title="Job Descriptions" />
+              <JobList />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/jobs/create"
+          element={
+            <ProtectedRoute>
+              <CreateJob />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/jobs/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditJob />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Placeholders */}
         <Route
           path="/resumes"
           element={
