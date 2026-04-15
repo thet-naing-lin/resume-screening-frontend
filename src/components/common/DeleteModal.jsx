@@ -1,4 +1,10 @@
-export default function DeleteModal({ user, onConfirm, onCancel, loading }) {
+export default function DeleteModal({
+  title,
+  description,
+  onConfirm,
+  onCancel,
+  loading,
+}) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
@@ -17,14 +23,12 @@ export default function DeleteModal({ user, onConfirm, onCancel, loading }) {
             />
           </svg>
         </div>
+
         <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">
-          Delete User
+          {title}
         </h3>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Are you sure you want to delete{" "}
-          <strong className="text-gray-800">{user.name}</strong>? This cannot be
-          undone.
-        </p>
+        <p className="text-sm text-gray-500 text-center mb-6">{description}</p>
+
         <div className="flex gap-3">
           <button
             onClick={onCancel}

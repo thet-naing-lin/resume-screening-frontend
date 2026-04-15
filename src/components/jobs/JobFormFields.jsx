@@ -13,6 +13,15 @@ export function SkillTagInput({ skills, onChange, error }) {
     }
   }
 
+  // ← ADD THIS: fires when user clicks away or presses Tab
+  function handleBlur() {
+    if (input.trim()) {
+      const newSkill = input.trim().replace(",", "");
+      if (!skills.includes(newSkill)) onChange([...skills, newSkill]);
+      setInput("");
+    }
+  }
+
   function removeSkill(skill) {
     onChange(skills.filter((s) => s !== skill));
   }
@@ -42,6 +51,7 @@ export function SkillTagInput({ skills, onChange, error }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={addSkill}
+          onBlur={handleBlur}
           placeholder={
             skills.length === 0
               ? 'Type a skill and press Enter (e.g. "Laravel")'

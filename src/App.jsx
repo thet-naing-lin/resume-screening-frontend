@@ -7,6 +7,7 @@ import UserManagement from "./pages/admin/UserManagement";
 import JobList from "./pages/jobs/JobList";
 import CreateJob from "./pages/jobs/CreateJob";
 import EditJob from "./pages/jobs/EditJob";
+import ViewJob from "./pages/jobs/ViewJob";
 
 const PlaceholderPage = ({ title }) => {
   const DashboardLayout =
@@ -90,6 +91,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <EditJob />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/jobs/:id"
+          element={
+            <ProtectedRoute>
+              <ViewJob />
             </ProtectedRoute>
           }
         />
