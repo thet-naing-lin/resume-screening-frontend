@@ -2,59 +2,62 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { createJob } from "../../api/jobApi";
+import { SkillTagInput } from "../../components/jobs/JobFormFields";
 
 const EMPTY_FORM = {
   title: "",
   description: "",
   required_skills: [],
+  required_qualification: "",
   experience_level: "",
+  experience_years: "",
   employment_type: "",
   location: "",
   status: "active",
 };
 
-function SkillTagInput({ skills, onChange }) {
-  const [input, setInput] = useState("");
+// function SkillTagInput({ skills, onChange }) {
+//   const [input, setInput] = useState("");
 
-  function addSkill(e) {
-    if ((e.key === "Enter" || e.key === ",") && input.trim()) {
-      e.preventDefault();
-      const newSkill = input.trim().replace(",", "");
-      if (!skills.includes(newSkill)) onChange([...skills, newSkill]);
-      setInput("");
-    }
-  }
+//   function addSkill(e) {
+//     if ((e.key === "Enter" || e.key === ",") && input.trim()) {
+//       e.preventDefault();
+//       const newSkill = input.trim().replace(",", "");
+//       if (!skills.includes(newSkill)) onChange([...skills, newSkill]);
+//       setInput("");
+//     }
+//   }
 
-  return (
-    <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-xl min-h-[48px] bg-white focus-within:ring-2 focus-within:ring-indigo-400">
-      {skills.map((skill) => (
-        <span
-          key={skill}
-          className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-sm px-3 py-1 rounded-full font-medium"
-        >
-          {skill}
-          <button
-            type="button"
-            onClick={() => onChange(skills.filter((s) => s !== skill))}
-            className="text-indigo-400 hover:text-indigo-700 font-bold ml-1"
-          >
-            ×
-          </button>
-        </span>
-      ))}
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={addSkill}
-        placeholder={
-          skills.length === 0 ? "Type a skill, press Enter" : "Add more..."
-        }
-        className="flex-1 outline-none text-sm min-w-[160px] bg-transparent"
-      />
-    </div>
-  );
-}
+//   return (
+//     <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-xl min-h-[48px] bg-white focus-within:ring-2 focus-within:ring-indigo-400">
+//       {skills.map((skill) => (
+//         <span
+//           key={skill}
+//           className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-sm px-3 py-1 rounded-full font-medium"
+//         >
+//           {skill}
+//           <button
+//             type="button"
+//             onClick={() => onChange(skills.filter((s) => s !== skill))}
+//             className="text-indigo-400 hover:text-indigo-700 font-bold ml-1"
+//           >
+//             ×
+//           </button>
+//         </span>
+//       ))}
+//       <input
+//         type="text"
+//         value={input}
+//         onChange={(e) => setInput(e.target.value)}
+//         onKeyDown={addSkill}
+//         placeholder={
+//           skills.length === 0 ? "Type a skill, press Enter" : "Add more..."
+//         }
+//         className="flex-1 outline-none text-sm min-w-[160px] bg-transparent"
+//       />
+//     </div>
+//   );
+// }
 
 function Field({ label, required, error, children }) {
   return (
@@ -208,6 +211,33 @@ export default function CreateJob() {
                   if (errors.required_skills)
                     setErrors((prev) => ({ ...prev, required_skills: "" }));
                 }}
+              />
+            </Field>
+
+            <Field
+              label="Required Qualification"
+              error={errors.required_qualification}
+            >
+              <textarea
+                name="required_qualification"
+                value={form.required_qualification}
+                onChange={handleChange}
+                rows={3}
+                placeholder="e.g. Bachelor's degree in Computer Science or related field..."
+                className={`${inputClass("required_qualification")} resize-none`}
+              />
+            </Field>
+
+            <Field label="Experience Years" error={errors.experience_years}>
+              <input
+                type="number"
+                name="experience_years"
+                value={form.experience_years}
+                onChange={handleChange}
+                min={0}
+                max={50}
+                placeholder="e.g. 3"
+                className={inputClass("experience_years")}
               />
             </Field>
 

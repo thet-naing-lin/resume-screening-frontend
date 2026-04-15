@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getJobs, deleteJob } from "../../api/jobApi";
-import { fr } from "zod/locales";
+import DeleteModal from "../../components/common/DeleteModal";
 
 // ── Badge helpers ──
 const EXP_BADGE = {
@@ -26,54 +26,6 @@ function Badge({ label, style }) {
     >
       {label}
     </span>
-  );
-}
-
-function DeleteModal({ job, onConfirm, onCancel, loading }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
-          <svg
-            className="w-6 h-6 text-red-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
-          </svg>
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-1">
-          Delete Job Description
-        </h3>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Are you sure you want to delete{" "}
-          <strong className="text-gray-800">"{job.title}"</strong>? This cannot
-          be undone.
-        </p>
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
-          >
-            {loading ? "Deleting..." : "Delete"}
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -306,6 +258,8 @@ export default function JobList() {
                       <th className="px-6 py-3 text-left">Skills</th>
                       <th className="px-6 py-3 text-left">Level</th>
                       <th className="px-6 py-3 text-left">Type</th>
+                      <th className="px-6 py-3 text-left">Exp. Years</th>
+                      <th className="px-6 py-3 text-left">Qualification</th>
                       <th className="px-6 py-3 text-left">Status</th>
                       <th className="px-6 py-3 text-left">Created</th>
                       <th className="px-6 py-3 text-right">Actions</th>
@@ -318,9 +272,17 @@ export default function JobList() {
                         className="hover:bg-gray-50 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <p className="font-medium text-gray-900">
+                          {/* <p className="font-medium text-gray-900">
+                            {job.title}
+                          </p> */}
+
+                          <p
+                            className="font-medium text-gray-900 hover:text-indigo-600 cursor-pointer transition-colors"
+                            onClick={() => navigate(`/jobs/${job.id}`)}
+                          >
                             {job.title}
                           </p>
+
                           {job.location && (
                             <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
                               <svg
@@ -369,11 +331,32 @@ export default function JobList() {
                             style={EXP_BADGE[job.experience_level]}
                           />
                         </td>
+
                         <td className="px-6 py-4">
                           <Badge
                             label={job.employment_type}
                             style={EMP_BADGE[job.employment_type]}
                           />
+                        </td>
+
+                        {/* ← ADD: Experience Years */}
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {job.experience_years != null ? (
+                            `${job.experience_years} yr${job.experience_years !== 1 ? "s" : ""}`
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+
+                        {/* ← ADD: Required Qualification */}
+                        <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px]">
+                          {job.required_qualification ? (
+                            <span className="line-clamp-2">
+                              {job.required_qualification}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <Badge
@@ -390,6 +373,13 @@ export default function JobList() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
+                            {/* View button */}
+                            <button
+                              onClick={() => navigate(`/jobs/${job.id}`)}
+                              className="text-gray-500 hover:text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              View
+                            </button>
                             {/* Edit */}
                             <button
                               onClick={() => navigate(`/jobs/${job.id}/edit`)}
@@ -418,7 +408,14 @@ export default function JobList() {
 
       {deleteTarget && (
         <DeleteModal
-          job={deleteTarget}
+          title="Delete Job Description"
+          description={
+            <>
+              Are you sure you want to delete{" "}
+              <strong className="text-gray-800">"{deleteTarget.title}"</strong>?
+              This cannot be undone.
+            </>
+          }
           loading={deleteLoading}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
