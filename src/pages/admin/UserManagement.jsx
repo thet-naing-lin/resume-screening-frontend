@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/layout/DashboardLayout";
-import DeleteModal from "../../components/admin/DeleteModal";
 import { getUsers, assignRole, deleteUser } from "../../api/userApi";
+import DeleteModal from "../../components/common/DeleteModal";
 
 // ── Helpers ──
 const ROLE_BADGE = {
@@ -259,7 +259,14 @@ export default function UserManagement() {
 
       {deleteTarget && (
         <DeleteModal
-          user={deleteTarget}
+          title="Delete User"
+          description={
+            <>
+              Are you sure you want to delete{" "}
+              <strong className="text-gray-800">{deleteTarget.name}</strong>?
+              This cannot be undone.
+            </>
+          }
           loading={deleteLoading}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
