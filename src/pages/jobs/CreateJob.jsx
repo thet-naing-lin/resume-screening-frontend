@@ -245,6 +245,7 @@ export default function CreateJob() {
                   <option value="part-time">Part-Time</option>
                   <option value="contract">Contract</option>
                   <option value="internship">Internship</option>
+                  <option value="freelance">Freelance</option>
                 </select>
               </Field>
             </div>

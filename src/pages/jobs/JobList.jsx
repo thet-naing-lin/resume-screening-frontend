@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getJobs, deleteJob } from "../../api/jobApi";
+import { fr } from "zod/locales";
 
 // ── Badge helpers ──
 const EXP_BADGE = {
@@ -15,6 +16,7 @@ const EMP_BADGE = {
   "part-time": "bg-yellow-100 text-yellow-700",
   contract: "bg-orange-100 text-orange-700",
   internship: "bg-pink-100   text-pink-700",
+  freelance: "bg-teal-100   text-teal-700",
 };
 
 function Badge({ label, style }) {
