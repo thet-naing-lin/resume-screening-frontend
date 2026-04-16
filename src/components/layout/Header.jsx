@@ -5,10 +5,10 @@ import useAuthStore from "../../store/authStore";
 const pageTitles = {
   "/dashboard": "Dashboard",
   "/jobs": "Job Descriptions",
-  "/resumes": "Upload Resumes",
+  "/resumes/upload": "Upload Resume",
   "/candidates": "Candidates",
   "/reports": "Reports & Export",
-  "/users": "User Management",
+  "/admin/users": "User Management",
   "/audit-logs": "Audit Logs",
 };
 

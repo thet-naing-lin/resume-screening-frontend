@@ -16,49 +16,6 @@ const EMPTY_FORM = {
   status: "active",
 };
 
-// function SkillTagInput({ skills, onChange }) {
-//   const [input, setInput] = useState("");
-
-//   function addSkill(e) {
-//     if ((e.key === "Enter" || e.key === ",") && input.trim()) {
-//       e.preventDefault();
-//       const newSkill = input.trim().replace(",", "");
-//       if (!skills.includes(newSkill)) onChange([...skills, newSkill]);
-//       setInput("");
-//     }
-//   }
-
-//   return (
-//     <div className="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-xl min-h-[48px] bg-white focus-within:ring-2 focus-within:ring-indigo-400">
-//       {skills.map((skill) => (
-//         <span
-//           key={skill}
-//           className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-sm px-3 py-1 rounded-full font-medium"
-//         >
-//           {skill}
-//           <button
-//             type="button"
-//             onClick={() => onChange(skills.filter((s) => s !== skill))}
-//             className="text-indigo-400 hover:text-indigo-700 font-bold ml-1"
-//           >
-//             ×
-//           </button>
-//         </span>
-//       ))}
-//       <input
-//         type="text"
-//         value={input}
-//         onChange={(e) => setInput(e.target.value)}
-//         onKeyDown={addSkill}
-//         placeholder={
-//           skills.length === 0 ? "Type a skill, press Enter" : "Add more..."
-//         }
-//         className="flex-1 outline-none text-sm min-w-[160px] bg-transparent"
-//       />
-//     </div>
-//   );
-// }
-
 function Field({ label, required, error, children }) {
   return (
     <div>
