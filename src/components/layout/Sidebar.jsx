@@ -42,7 +42,7 @@ const hrLinks = [
     ),
   },
   {
-    to: "/resumes",
+    to: "/resumes/upload",
     label: "Upload Resumes",
     icon: (
       <svg
