@@ -36,6 +36,8 @@ export default function ResumeList() {
   const [flash, setFlash] = useState(""); // success message
   const [deleteTarget, setDeleteTarget] = useState(null); // resume object to delete
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterJob, setFilterJob] = useState("all");
 
   // ── Fetch resumes ─────────────────────────────────────────────
   useEffect(() => {
@@ -78,6 +80,24 @@ export default function ResumeList() {
       setDeleteLoading(false);
     }
   }
+
+  // Client-side filter — runs on every render when search/filterJob changes
+  const filtered = resumes.filter((resume) => {
+    const candidateName = resume.candidate?.name?.toLowerCase() ?? "";
+    const jobTitle = resume.job_description?.title?.toLowerCase() ?? "";
+    const filename = resume.original_filename.toLowerCase();
+    const query = search.toLowerCase();
+
+    const matchSearch =
+      candidateName.includes(query) ||
+      jobTitle.includes(query) ||
+      filename.includes(query); // bonus: also searchable by filename
+
+    const matchJob =
+      filterJob === "all" || String(resume.job_description?.id) === filterJob;
+
+    return matchSearch && matchJob;
+  });
 
   // ── Render ────────────────────────────────────────────────────
   return (
@@ -135,12 +155,81 @@ export default function ResumeList() {
             </div>
           )}
 
+          {/* Search + Filter bar */}
+          <div className="flex gap-3 mb-4">
+            {/* Search input */}
+            <div className="relative flex-1">
+              <svg
+                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+                />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search by candidate name, job, or filename..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              />
+              {/* Clear button — only shows when search has text */}
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Job position filter dropdown */}
+            <select
+              value={filterJob}
+              onChange={(e) => setFilterJob(e.target.value)}
+              className="px-4 py-2.5 text-sm border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="all">All Positions</option>
+              {/* Build unique job options from the loaded resumes */}
+              {[
+                ...new Map(
+                  resumes
+                    .filter((r) => r.job_description)
+                    .map((r) => [r.job_description.id, r.job_description]),
+                ).values(),
+              ].map((job) => (
+                <option key={job.id} value={String(job.id)}>
+                  {job.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Table card */}
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-semibold text-gray-900">All Resumes</h2>
               <span className="text-sm text-gray-400">
-                {resumes.length} total
+                {filtered.length} results
               </span>
             </div>
 
@@ -165,26 +254,34 @@ export default function ResumeList() {
             )}
 
             {/* Empty state */}
-            {!loading && resumes.length === 0 && !error && (
+            {!loading && filtered.length === 0 && !error && (
               <div className="py-16 text-center text-gray-400">
-                <p className="text-4xl mb-3">📄</p>
+                <p className="text-4xl mb-3">
+                  {search || filterJob !== "all" ? "🔍" : "📄"}
+                </p>
                 <p className="font-medium text-gray-500">
-                  No resumes uploaded yet
+                  {search || filterJob !== "all"
+                    ? "No resumes match your search."
+                    : "No resumes uploaded yet"}
                 </p>
                 <p className="text-sm mt-1">
-                  Upload your first resume to get started.
+                  {search || filterJob !== "all"
+                    ? "Try a different name or job position."
+                    : "Upload your first resume to get started."}
                 </p>
-                <Link
-                  to="/resumes/upload"
-                  className="mt-4 inline-block px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors"
-                >
-                  Upload Resume
-                </Link>
+                {!search && filterJob === "all" && (
+                  <Link
+                    to="/resumes/upload"
+                    className="mt-4 inline-block px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+                  >
+                    Upload Resume
+                  </Link>
+                )}
               </div>
             )}
 
             {/* Table */}
-            {!loading && resumes.length > 0 && (
+            {!loading && filtered.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
@@ -199,7 +296,7 @@ export default function ResumeList() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {resumes.map((resume) => (
+                    {filtered.map((resume) => (
                       <tr
                         key={resume.id}
                         className="hover:bg-gray-50 transition-colors"
@@ -239,7 +336,17 @@ export default function ResumeList() {
 
                         {/* Status */}
                         <td className="px-6 py-4">
-                          <StatusBadge status={resume.status} />
+                          {resume.status === "failed" && resume.parse_error ? (
+                            <div className="relative group">
+                              <StatusBadge status="failed" />
+                              {/* Tooltip showing the actual error */}
+                              <div className="absolute left-0 top-7 z-10 hidden group-hover:block w-64 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg">
+                                {resume.parse_error}
+                              </div>
+                            </div>
+                          ) : (
+                            <StatusBadge status={resume.status} />
+                          )}
                         </td>
 
                         {/* Date */}
@@ -320,9 +427,9 @@ export default function ResumeList() {
         <DeleteModal
           isOpen={!!deleteTarget}
           title="Delete Resume"
-          message={`Are you sure you want to delete "${deleteTarget.original_filename}"? This will permanently remove the file and cannot be undone.`}
+          description={`Are you sure you want to delete "${deleteTarget.original_filename}"? This will permanently remove the file and cannot be undone.`}
           onConfirm={handleDelete}
-          onClose={() => setDeleteTarget(null)}
+          onCancel={() => setDeleteTarget(null)}
           loading={deleteLoading}
         />
       )}
