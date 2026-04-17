@@ -8,7 +8,7 @@ const api = axios.create({
   },
 });
 
-// Auto-attach Bearer token to every request
+// Auto-attach token to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -17,12 +17,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 errors globally (token expired)
+// Handle expired/invalid token globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
       window.location.href = "/login";
     }
     return Promise.reject(error);
