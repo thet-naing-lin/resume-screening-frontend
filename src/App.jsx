@@ -8,7 +8,8 @@ import JobList from "./pages/jobs/JobList";
 import CreateJob from "./pages/jobs/CreateJob";
 import EditJob from "./pages/jobs/EditJob";
 import ViewJob from "./pages/jobs/ViewJob";
-import UploadResume from "./pages/candidates/UploadResume";
+import UploadResume from "./pages/resumes/UploadResume";
+import ResumeList from "./pages/resumes/ResumeList";
 
 const PlaceholderPage = ({ title }) => {
   const DashboardLayout =
@@ -105,6 +106,14 @@ export default function App() {
         />
 
         {/* Resumes */}
+        <Route
+          path="/resumes"
+          element={
+            <ProtectedRoute>
+              <ResumeList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/resumes/upload"
           element={
