@@ -1,7 +1,7 @@
 import api from "./axios";
 
-// Upload a resume — must use FormData for file uploads
-export const uploadResume = (formData) => {
+// Upload one or multiple resumes
+export const uploadResumes = (formData) => {
   return api.post("/resumes", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -13,3 +13,5 @@ export const uploadResume = (formData) => {
 export const getResumes = () => {
   return api.get("/resumes");
 };
+
+export const deleteResume = (id) => api.delete(`/resumes/${id}`);
