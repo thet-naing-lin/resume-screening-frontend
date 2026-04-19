@@ -7,41 +7,55 @@ import UserManagement from "./pages/admin/UserManagement";
 import JobList from "./pages/jobs/JobList";
 import CreateJob from "./pages/jobs/CreateJob";
 import EditJob from "./pages/jobs/EditJob";
+``;
 import ViewJob from "./pages/jobs/ViewJob";
 import UploadResume from "./pages/resumes/UploadResume";
 import ResumeList from "./pages/resumes/ResumeList";
+import CandidateRankingPage from "./pages/candidates/CandidateRankingPage";
+import DashboardLayout from "./components/layout/DashboardLayout";
 
-const PlaceholderPage = ({ title }) => {
-  const DashboardLayout =
-    require("./components/layout/DashboardLayout").default;
-  return (
-    <DashboardLayout>
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-blue-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-slate-700">{title}</h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Coming in the next sprint
-          </p>
-        </div>
+// const PlaceholderPage = ({ title }) => {
+//   const DashboardLayout =
+//     require("./components/layout/DashboardLayout").default;
+//   return (
+//     <DashboardLayout>
+//       <div className="flex items-center justify-center h-64">
+//         <div className="text-center">
+//           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+//             <svg
+//               className="w-8 h-8 text-blue-400"
+//               fill="none"
+//               stroke="currentColor"
+//               viewBox="0 0 24 24"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth={2}
+//                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+//               />
+//             </svg>
+//           </div>
+//           <h2 className="text-lg font-semibold text-slate-700">{title}</h2>
+//           <p className="text-sm text-slate-400 mt-1">
+//             Coming in the next sprint
+//           </p>
+//         </div>
+//       </div>
+//     </DashboardLayout>
+//   );
+// };
+
+const PlaceholderPage = ({ title }) => (
+  <DashboardLayout>
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <h2 className="text-lg font-semibold text-slate-700">{title}</h2>
+        <p className="text-sm text-slate-400 mt-1">Coming in the next sprint</p>
       </div>
-    </DashboardLayout>
-  );
-};
+    </div>
+  </DashboardLayout>
+);
 
 export default function App() {
   return (
@@ -123,15 +137,25 @@ export default function App() {
           }
         />
 
-        {/* Placeholders */}
+        {/* Candidates Ranking */}
         <Route
+          path="/candidate-rankings"
+          element={
+            <ProtectedRoute>
+              <CandidateRankingPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Placeholders */}
+        {/* <Route
           path="/candidates"
           element={
             <ProtectedRoute>
               <PlaceholderPage title="Candidates" />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path="/reports"
           element={
