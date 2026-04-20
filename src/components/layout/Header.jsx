@@ -4,11 +4,11 @@ import useAuthStore from "../../store/authStore";
 // Maps route paths to readable page titles
 const pageTitles = {
   "/dashboard": "Dashboard",
-  "/jobs": "Job Descriptions",
-  "/resumes": "Upload Resume",
-  "/candidates": "Candidates",
+  "/jobs": "Jobs",
+  "/resumes": "Resumes",
+  "/candidate-rankings": "Candidate",
   "/reports": "Reports & Export",
-  "/admin/users": "User Management",
+  "/admin/users": "Users",
   "/audit-logs": "Audit Logs",
 };
 
