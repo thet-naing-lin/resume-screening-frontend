@@ -3,6 +3,7 @@ import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getJobs } from "../../api/jobApi";
 import { useRankings } from "../../hooks/useRankings";
 import { updateCandidateStatus } from "../../api/candidatesRankingApi";
+import AiInsightsModal from "../../components/candidates/AiInsightsModal";
 
 // ── Helpers ──────────────────────────────────────────────────
 function ScoreBadge({ score }) {
@@ -51,6 +52,8 @@ export default function CandidateRankingPage() {
   });
   const [activeFilters, setActiveFilters] = useState({});
   const [updatingId, setUpdatingId] = useState(null);
+
+  const [aiTarget, setAiTarget] = useState(null); // the selected resume row
 
   // ── Fetch jobs ONCE on mount — one useEffect, one method ──
   useEffect(() => {
@@ -316,21 +319,33 @@ export default function CandidateRankingPage() {
                             <StatusBadge status={item.score.status} />
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <select
-                              value={item.score.status}
-                              disabled={updatingId === item.resume_id}
-                              onChange={(e) =>
-                                handleStatusChange(
-                                  item.resume_id,
-                                  e.target.value,
-                                )
-                              }
-                              className="border rounded-lg px-2 py-1 text-xs disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                            >
-                              <option value="shortlisted">Shortlist</option>
-                              <option value="under_review">Under Review</option>
-                              <option value="rejected">Reject</option>
-                            </select>
+                            {/* Stack vertically — no more horizontal cramping */}
+                            <div className="flex flex-col items-center gap-1.5">
+                              <select
+                                value={item.score.status}
+                                disabled={updatingId === item.resume_id}
+                                onChange={(e) =>
+                                  handleStatusChange(
+                                    item.resume_id,
+                                    e.target.value,
+                                  )
+                                }
+                                className="border rounded-lg px-2 py-1 text-xs w-full max-w-[120px] disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              >
+                                <option value="shortlisted">Shortlist</option>
+                                <option value="under_review">
+                                  Under Review
+                                </option>
+                                <option value="rejected">Reject</option>
+                              </select>
+
+                              <button
+                                onClick={() => setAiTarget(item)}
+                                className="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg hover:bg-indigo-100 transition-colors w-full max-w-[120px] whitespace-nowrap"
+                              >
+                                ✨ AI Insights
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -364,6 +379,10 @@ export default function CandidateRankingPage() {
           </>
         )}
       </div>
+
+      {aiTarget && (
+        <AiInsightsModal resume={aiTarget} onClose={() => setAiTarget(null)} />
+      )}
     </DashboardLayout>
   );
 }
