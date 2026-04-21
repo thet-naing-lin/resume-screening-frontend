@@ -223,7 +223,7 @@ export default function Dashboard() {
                 {
                   label: "View Candidates",
                   desc: "See ranked and scored candidates",
-                  to: "/candidates",
+                  to: "/candidate-rankings",
                   color: "bg-emerald-50 text-emerald-700",
                   icon: "👥",
                 },

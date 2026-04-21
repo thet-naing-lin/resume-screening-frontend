@@ -80,8 +80,8 @@ const hrLinks = [
   //   ),
   // },
   {
-    to: "/candidates",
-    label: "Candidates",
+    to: "/candidate-rankings",
+    label: "Candidate Rankings",
     icon: (
       <svg
         className="w-5 h-5"

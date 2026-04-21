@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getJobs, deleteJob } from "../../api/jobApi";
 import DeleteModal from "../../components/common/DeleteModal";
+import { BsTrash } from "react-icons/bs";
+import { FaRegEye, FaUserEdit } from "react-icons/fa";
 
 // ── Badge helpers ──
 const EXP_BADGE = {
@@ -259,10 +261,10 @@ export default function JobList() {
                       <th className="px-6 py-3 text-left">Level</th>
                       <th className="px-6 py-3 text-left">Type</th>
                       <th className="px-6 py-3 text-left">Exp. Years</th>
-                      <th className="px-6 py-3 text-left">Qualification</th>
+                      {/* <th className="px-6 py-3 text-left">Qualification</th> */}
                       <th className="px-6 py-3 text-left">Status</th>
                       <th className="px-6 py-3 text-left">Created</th>
-                      <th className="px-6 py-3 text-right">Actions</th>
+                      <th className="px-6 py-3 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -349,7 +351,7 @@ export default function JobList() {
                         </td>
 
                         {/* ← ADD: Required Qualification */}
-                        <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px]">
+                        {/* <td className="px-6 py-4 text-sm text-gray-500 max-w-[200px]">
                           {job.required_qualification ? (
                             <span className="line-clamp-2">
                               {job.required_qualification}
@@ -357,7 +359,8 @@ export default function JobList() {
                           ) : (
                             <span className="text-gray-300">—</span>
                           )}
-                        </td>
+                        </td> */}
+
                         <td className="px-6 py-4">
                           <Badge
                             label={job.status}
@@ -378,21 +381,21 @@ export default function JobList() {
                               onClick={() => navigate(`/jobs/${job.id}`)}
                               className="text-gray-500 hover:text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                             >
-                              View
+                              <FaRegEye />
                             </button>
                             {/* Edit */}
                             <button
                               onClick={() => navigate(`/jobs/${job.id}/edit`)}
                               className="text-indigo-500 hover:text-indigo-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
                             >
-                              Edit
+                              <FaUserEdit />
                             </button>
                             {/* Delete */}
                             <button
                               onClick={() => setDeleteTarget(job)}
                               className="text-red-500 hover:text-red-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
                             >
-                              Delete
+                              <BsTrash />
                             </button>
                           </div>
                         </td>
