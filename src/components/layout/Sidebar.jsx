@@ -141,7 +141,7 @@ const adminLinks = [
     ),
   },
   {
-    to: "/audit-logs",
+    to: "/admin/audit-logs",
     label: "Audit Logs",
     icon: (
       <svg

@@ -13,6 +13,8 @@ import UploadResume from "./pages/resumes/UploadResume";
 import ResumeList from "./pages/resumes/ResumeList";
 import CandidateRankingPage from "./pages/candidates/CandidateRankingPage";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import AuditLogsPage from "./pages/admin/AuditLogsPage";
+import ReportsExportPage from "./pages/reports/ReportExportPage";
 
 // const PlaceholderPage = ({ title }) => {
 //   const DashboardLayout =
@@ -84,6 +86,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/audit-logs"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AuditLogsPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Jobs — US-003, US-004, US-005 */}
         <Route
@@ -147,28 +157,11 @@ export default function App() {
           }
         />
 
-        {/* Placeholders */}
-        {/* <Route
-          path="/candidates"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="Candidates" />
-            </ProtectedRoute>
-          }
-        /> */}
         <Route
           path="/reports"
           element={
             <ProtectedRoute>
-              <PlaceholderPage title="Reports & Export" />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/audit-logs"
-          element={
-            <ProtectedRoute>
-              <PlaceholderPage title="Audit Logs" />
+              <ReportsExportPage />
             </ProtectedRoute>
           }
         />

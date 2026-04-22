@@ -9,7 +9,7 @@ const pageTitles = {
   "/candidate-rankings": "Candidate",
   "/reports": "Reports & Export",
   "/admin/users": "Users",
-  "/audit-logs": "Audit Logs",
+  "/admin/audit-logs": "Logs",
 };
 
 export default function Header({ onMenuClick }) {
