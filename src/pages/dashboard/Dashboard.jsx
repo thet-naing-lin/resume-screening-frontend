@@ -1,19 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import useAuthStore from "../../store/authStore";
+import { getDashboardStats } from "../../api/dashboardApi";
 
-// Stat card component
-function StatCard({ label, value, icon, color, sub }) {
+// ── Stat Card ─────────────────────────────────────────────────
+function StatCard({ label, value, icon, color, sub, loading }) {
   return (
-    <div
-      className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6
-                    hover:shadow-md transition-shadow"
-    >
+    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
-        <div>
+        <div className="flex-1">
           <p className="text-sm font-medium text-slate-500">{label}</p>
-          <p className="text-3xl font-bold text-slate-800 mt-1">{value}</p>
-          {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
+          {loading ? (
+            <div className="h-9 w-16 bg-slate-100 rounded-lg animate-pulse mt-1" />
+          ) : (
+            <p className="text-3xl font-bold text-slate-800 mt-1">{value}</p>
+          )}
+          {sub && !loading && (
+            <p className="text-xs text-slate-400 mt-1">{sub}</p>
+          )}
         </div>
         <div
           className={`w-12 h-12 ${color} rounded-2xl flex items-center justify-center shrink-0`}
@@ -25,49 +29,67 @@ function StatCard({ label, value, icon, color, sub }) {
   );
 }
 
-// Activity item component
-function ActivityItem({ action, entity, time, role }) {
+// ── Activity Item ─────────────────────────────────────────────
+function ActivityItem({ action, metadata, time }) {
+  // Color per action prefix
+  const color = action.startsWith("auth")
+    ? "bg-blue-50 text-blue-500"
+    : action.startsWith("resume")
+      ? "bg-violet-50 text-violet-500"
+      : action.startsWith("job")
+        ? "bg-amber-50 text-amber-500"
+        : action.startsWith("candidate")
+          ? "bg-emerald-50 text-emerald-500"
+          : action.startsWith("ai")
+            ? "bg-indigo-50 text-indigo-500"
+            : "bg-slate-100 text-slate-500";
+
+  // Human-readable description
+  const descriptions = {
+    "auth.login": "Logged in",
+    "auth.logout": "Logged out",
+    "resume.uploaded": `Uploaded resume${metadata?.filename ? ` — ${metadata.filename}` : ""}`,
+    "resume.deleted": `Deleted resume${metadata?.filename ? ` — ${metadata.filename}` : ""}`,
+    "job.created": `Created job${metadata?.title ? ` — ${metadata.title}` : ""}`,
+    "job.updated": `Updated job${metadata?.title ? ` — ${metadata.title}` : ""}`,
+    "job.deleted": `Deleted job${metadata?.title ? ` — ${metadata.title}` : ""}`,
+    "candidate.status_changed": `Candidate status → ${metadata?.new_status ?? "updated"}`,
+    "ai.insights_generated": `AI insights generated${metadata?.job_title ? ` for ${metadata.job_title}` : ""}`,
+  };
+
+  const label = descriptions[action] ?? action.replace(/\./g, " → ");
+
   return (
     <div className="flex items-start gap-3 py-3 border-b border-slate-50 last:border-0">
       <div
-        className="w-8 h-8 bg-blue-50 rounded-full flex items-center
-                      justify-center shrink-0 mt-0.5"
+        className={`w-8 h-8 ${color} rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold`}
       >
-        <svg
-          className="w-4 h-4 text-blue-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+        {action.startsWith("auth")
+          ? "🔑"
+          : action.startsWith("resume")
+            ? "📄"
+            : action.startsWith("job")
+              ? "💼"
+              : action.startsWith("candidate")
+                ? "👤"
+                : action.startsWith("ai")
+                  ? "✨"
+                  : "📋"}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-slate-700">
-          <span className="font-medium capitalize">{action}</span>
-          {" — "}
-          <span className="text-slate-500">{entity}</span>
-        </p>
+        <p className="text-sm text-slate-700">{label}</p>
         <p className="text-xs text-slate-400 mt-0.5">{time}</p>
       </div>
-      <span
-        className="text-xs bg-slate-100 text-slate-600 px-2 py-1
-                       rounded-full capitalize shrink-0"
-      >
-        {role}
-      </span>
     </div>
   );
 }
 
+// ── Main Component ────────────────────────────────────────────
 export default function Dashboard() {
   const { user } = useAuthStore();
   const [greeting, setGreeting] = useState("");
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -76,12 +98,30 @@ export default function Dashboard() {
     else setGreeting("Good evening");
   }, []);
 
-  // Placeholder stats — will be replaced with real API data in Sprint 2
-  const stats = [
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const res = await getDashboardStats();
+      setStats(res.data);
+    } catch (err) {
+      console.error("Failed to load dashboard stats:", err);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  const statCards = [
     {
       label: "Active Job Posts",
-      value: "0",
-      sub: "No jobs posted yet",
+      value: stats?.active_jobs ?? 0,
+      sub:
+        stats?.active_jobs > 0
+          ? `${stats.active_jobs} active position${stats.active_jobs > 1 ? "s" : ""}`
+          : "No active jobs yet",
       color: "bg-blue-50",
       icon: (
         <svg
@@ -101,8 +141,11 @@ export default function Dashboard() {
     },
     {
       label: "Total Resumes",
-      value: "0",
-      sub: "No resumes uploaded yet",
+      value: stats?.total_resumes ?? 0,
+      sub:
+        stats?.total_resumes > 0
+          ? `${stats.total_resumes} resume${stats.total_resumes > 1 ? "s" : ""} uploaded`
+          : "No resumes uploaded yet",
       color: "bg-violet-50",
       icon: (
         <svg
@@ -122,8 +165,11 @@ export default function Dashboard() {
     },
     {
       label: "Candidates Screened",
-      value: "0",
-      sub: "No candidates yet",
+      value: stats?.candidates_screened ?? 0,
+      sub:
+        stats?.candidates_screened > 0
+          ? `${stats.candidates_screened} scored`
+          : "No candidates screened yet",
       color: "bg-emerald-50",
       icon: (
         <svg
@@ -143,8 +189,11 @@ export default function Dashboard() {
     },
     {
       label: "Avg Match Score",
-      value: "—",
-      sub: "Score after AI screening",
+      value: stats?.avg_score != null ? `${stats.avg_score}` : "—",
+      sub:
+        stats?.avg_score != null
+          ? "Average across all jobs"
+          : "Score after AI screening",
       color: "bg-amber-50",
       icon: (
         <svg
@@ -164,14 +213,13 @@ export default function Dashboard() {
     },
   ];
 
+  const recentActivity = stats?.recent_activity ?? [];
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Welcome banner */}
-        <div
-          className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6
-                        text-white shadow-lg shadow-blue-200"
-        >
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h2 className="text-xl font-bold">
@@ -192,8 +240,8 @@ export default function Dashboard() {
 
         {/* Stats grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} {...stat} />
+          {statCards.map((stat) => (
+            <StatCard key={stat.label} {...stat} loading={statsLoading} />
           ))}
         </div>
 
@@ -231,27 +279,21 @@ export default function Dashboard() {
                 <a
                   key={action.label}
                   href={action.to}
-                  className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50
-                             border border-transparent hover:border-slate-100 transition group"
+                  className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition group"
                 >
                   <span
-                    className={`text-xl w-10 h-10 ${action.color} rounded-xl
-                                    flex items-center justify-center shrink-0`}
+                    className={`text-xl w-10 h-10 ${action.color} rounded-xl flex items-center justify-center shrink-0`}
                   >
                     {action.icon}
                   </span>
                   <div>
-                    <p
-                      className="text-sm font-semibold text-slate-700
-                                  group-hover:text-blue-600 transition"
-                    >
+                    <p className="text-sm font-semibold text-slate-700 group-hover:text-blue-600 transition">
                       {action.label}
                     </p>
                     <p className="text-xs text-slate-400">{action.desc}</p>
                   </div>
                   <svg
-                    className="w-4 h-4 text-slate-300 group-hover:text-blue-400
-                                  ml-auto transition"
+                    className="w-4 h-4 text-slate-300 group-hover:text-blue-400 ml-auto transition"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -274,33 +316,61 @@ export default function Dashboard() {
               Recent Activity
             </h3>
 
-            {/* Empty state */}
-            <div className="flex flex-col items-center justify-center py-10 text-center">
-              <div
-                className="w-12 h-12 bg-slate-100 rounded-full flex items-center
-                              justify-center mb-3"
-              >
-                <svg
-                  className="w-6 h-6 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+            {/* Loading skeleton */}
+            {statsLoading && (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-3 items-center py-2">
+                    <div className="w-8 h-8 bg-slate-100 rounded-full animate-pulse shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3.5 bg-slate-100 rounded animate-pulse w-3/4" />
+                      <div className="h-2.5 bg-slate-100 rounded animate-pulse w-1/3" />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <p className="text-sm font-medium text-slate-500">
-                No activity yet
-              </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Actions will appear here as you use the system
-              </p>
-            </div>
+            )}
+
+            {/* Empty state */}
+            {!statsLoading && recentActivity.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-10 text-center">
+                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
+                  <svg
+                    className="w-6 h-6 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-sm font-medium text-slate-500">
+                  No activity yet
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Actions will appear here as you use the system
+                </p>
+              </div>
+            )}
+
+            {/* Activity list */}
+            {!statsLoading && recentActivity.length > 0 && (
+              <div>
+                {recentActivity.map((item, i) => (
+                  <ActivityItem
+                    key={i}
+                    action={item.action}
+                    metadata={item.metadata}
+                    time={item.created_at}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

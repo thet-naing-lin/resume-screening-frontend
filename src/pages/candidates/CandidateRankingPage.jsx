@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/layout/DashboardLayout";
 import { getJobs } from "../../api/jobApi";
 import { useRankings } from "../../hooks/useRankings";
-import { updateCandidateStatus } from "../../api/candidatesRankingApi";
+import {
+  exportRankingsCsv,
+  updateCandidateStatus,
+} from "../../api/candidatesRankingApi";
 import AiInsightsModal from "../../components/candidates/AiInsightsModal";
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -54,6 +57,45 @@ export default function CandidateRankingPage() {
   const [updatingId, setUpdatingId] = useState(null);
 
   const [aiTarget, setAiTarget] = useState(null); // the selected resume row
+
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(null);
+
+  const handleExport = async () => {
+    setExporting(true);
+    setExportError(null);
+
+    try {
+      const response = await exportRankingsCsv({
+        job_description_id: selectedJob,
+        // pass active filters too so CSV matches what HR sees on screen
+        ...(activeFilters.status && { status: activeFilters.status }),
+        ...(activeFilters.min_score && { min_score: activeFilters.min_score }),
+        ...(activeFilters.max_score && { max_score: activeFilters.max_score }),
+      });
+
+      // Create a temporary download link and click it
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Extract filename from Content-Disposition header if available
+      const disposition = response.headers["content-disposition"];
+      const match = disposition?.match(/filename="?([^"]+)"?/);
+      link.setAttribute("download", match?.[1] ?? "rankings.csv");
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setExportError(
+        "Export failed. Please check your connection and try again.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // ── Fetch jobs ONCE on mount — one useEffect, one method ──
   useEffect(() => {
@@ -255,14 +297,45 @@ export default function CandidateRankingPage() {
             {/* Ranking Table */}
             {!loading && candidates.length > 0 && (
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                {/* <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                   <h2 className="font-semibold text-gray-900">
                     Ranked Candidates
                   </h2>
                   <span className="text-sm text-gray-400">
                     {meta?.total} total
                   </span>
+                </div> */}
+
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <h2 className="font-semibold text-gray-900">
+                    Ranked Candidates
+                    <span className="text-xs text-gray-400">
+                      ({meta?.total} total)
+                    </span>
+                  </h2>
+
+                  <button
+                    onClick={handleExport}
+                    disabled={exporting || candidates.length === 0}
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {exporting ? <>⏳ Exporting...</> : <>⬇️ Export CSV</>}
+                  </button>
                 </div>
+
+                {/* ── Export error message — shows below header, above table ── */}
+                {exportError && (
+                  <div className="mx-6 mt-3 flex items-center justify-between bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                    <span>⚠️ {exportError}</span>
+                    <button
+                      onClick={() => setExportError(null)}
+                      className="ml-4 text-red-400 hover:text-red-600 font-bold text-lg leading-none"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
