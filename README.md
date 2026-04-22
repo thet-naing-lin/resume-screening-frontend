@@ -1,16 +1,90 @@
-# React + Vite
+# Resume Screening Tool — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React-based frontend for the Automated Resume Screening Tool. Built as part of a BSc Computing Final Year Project at the University of Roehampton.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 18** with Vite
+- **Tailwind CSS** for styling
+- **Axios** for API communication
+- **Zustand** for auth state management
+- **React Router v6** for navigation
+- **Spatie Laravel Permission** roles reflected in UI (admin / hr_recruiter)
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- JWT authentication with protected routes
+- Job description management (create, edit, delete)
+- Bulk resume upload (PDF / DOCX, max 5MB)
+- Candidate ranking table with filtering and pagination
+- AI insights modal (candidate summary + interview questions)
+- CSV export of ranked candidates
+- Audit logs viewer (admin only)
+- User management (admin only)
+- Reports & Export page
+- Responsive dashboard with live stats
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js 18+
+- Backend API running (see backend README)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/resume-screening-frontend.git
+cd resume-screening-frontend
+
+# Install dependencies
+npm install
+
+# Copy environment file
+cp .env.example .env
+```
+
+### Environment Variables
+
+Create a `.env` file in the root:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+
+### Running the App
+
+```bash
+# Development server
+npm run dev
+
+# Production build
+npm run build
+```
+
+App runs at `http://localhost:5173` by default.
+
+## Available Pages
+
+| Route                 | Description           | Access |
+| --------------------- | --------------------- | ------ |
+| `/login`              | Login page            | Public |
+| `/dashboard`          | Stats overview        | All    |
+| `/jobs`               | Job descriptions list | All    |
+| `/resumes`            | Resume upload & list  | All    |
+| `/candidate-rankings` | Ranked candidates     | All    |
+| `/reports`            | CSV export            | All    |
+| `/admin/users`        | User management       | Admin  |
+| `/admin/audit-logs`   | Audit logs            | Admin  |
+
+## Role-Based Access
+
+| Feature              | HR Recruiter | Admin |
+| -------------------- | ------------ | ----- |
+| Upload resumes       | ✅           | ✅    |
+| View rankings        | ✅           | ✅    |
+| Generate AI insights | ✅           | ✅    |
+| Export CSV           | ✅           | ✅    |
+| Manage users         | ❌           | ✅    |
+| View audit logs      | ❌           | ✅    |
