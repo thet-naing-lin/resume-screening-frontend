@@ -42,5 +42,22 @@ export function useRankings(jobId, filters) {
     fetchRankings(1);
   }, [fetchRankings]);
 
-  return { candidates, meta, loading, error, refetch: fetchRankings };
+  const updateCandidateLocally = (resumeId, newStatus) => {
+    setCandidates((prev) =>
+      prev.map((c) =>
+        c.resume_id === resumeId
+          ? { ...c, score: { ...c.score, status: newStatus } }
+          : c,
+      ),
+    );
+  };
+
+  return {
+    candidates,
+    meta,
+    loading,
+    error,
+    refetch: fetchRankings,
+    updateCandidateLocally,
+  };
 }

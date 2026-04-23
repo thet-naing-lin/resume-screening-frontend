@@ -117,10 +117,8 @@ export default function CandidateRankingPage() {
   }, []); // empty deps = runs once only
 
   // ── Rankings data via custom hook ──────────────────────────
-  const { candidates, meta, loading, error, refetch } = useRankings(
-    selectedJob,
-    activeFilters,
-  );
+  const { candidates, meta, loading, error, refetch, updateCandidateLocally } =
+    useRankings(selectedJob, activeFilters);
 
   const handleApplyFilters = () => setActiveFilters({ ...filters });
 
@@ -131,12 +129,17 @@ export default function CandidateRankingPage() {
   };
 
   const handleStatusChange = async (resumeId, newStatus) => {
+    // 1. Update UI instantly — no scroll jump
+    updateCandidateLocally(resumeId, newStatus);
     setUpdatingId(resumeId);
+
     try {
+      // 2. Persist to backend in background
       await updateCandidateStatus(resumeId, newStatus);
-      refetch();
     } catch {
-      alert("Failed to update status. Please try again.");
+      // 3. If it fails, revert by refetching the real data
+      alert("Failed to update status. Reverting...");
+      refetch();
     } finally {
       setUpdatingId(null);
     }
