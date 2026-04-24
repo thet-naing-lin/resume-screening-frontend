@@ -7,6 +7,9 @@ import {
   updateCandidateStatus,
 } from "../../api/candidatesRankingApi";
 import AiInsightsModal from "../../components/candidates/AiInsightsModal";
+import SendMailModal from "../../components/candidates/SendMailModal";
+import BulkMailModal from "../../components/candidates/BulkMailModal";
+import { getMailTemplate } from "../../api/candidateMailApi";
 
 // ── Helpers ──────────────────────────────────────────────────
 function ScoreBadge({ score }) {
@@ -60,6 +63,12 @@ export default function CandidateRankingPage() {
 
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState(null);
+
+  const [mailTarget, setMailTarget] = useState(null);
+
+  const [bulkStatus, setBulkStatus] = useState(null); // 'shortlisted' | 'rejected' | null
+  const [bulkSubject, setBulkSubject] = useState("");
+  const [bulkBody, setBulkBody] = useState("");
 
   const handleExport = async () => {
     setExporting(true);
@@ -145,6 +154,23 @@ export default function CandidateRankingPage() {
     }
   };
 
+  // Pre-load the template then open modal
+  const openBulk = async (status) => {
+    const type = status === "shortlisted" ? "interview" : "rejection";
+    const jobTitle =
+      jobDescriptions.find((j) => String(j.id) === String(selectedJob))
+        ?.title ?? "the position";
+
+    try {
+      const res = await getMailTemplate(type, "Candidate", jobTitle);
+      setBulkSubject(res.data.subject);
+      setBulkBody(res.data.body);
+    } catch {
+      setBulkSubject("");
+      setBulkBody("");
+    }
+    setBulkStatus(status);
+  };
   // ── Render ─────────────────────────────────────────────────
   return (
     <DashboardLayout>
@@ -317,13 +343,30 @@ export default function CandidateRankingPage() {
                     </span>
                   </h2>
 
-                  <button
-                    onClick={handleExport}
-                    disabled={exporting || candidates.length === 0}
-                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {exporting ? <>⏳ Exporting...</> : <>⬇️ Export CSV</>}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* 🆕 Bulk Email buttons */}
+                    <button
+                      onClick={() => openBulk("shortlisted")}
+                      className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors"
+                    >
+                      📨 Email Shortlisted
+                    </button>
+                    <button
+                      onClick={() => openBulk("rejected")}
+                      className="flex items-center gap-1.5 bg-red-50 text-red-700 px-3 py-2 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors"
+                    >
+                      📨 Email Rejected
+                    </button>
+
+                    {/* existing Export CSV button — untouched */}
+                    <button
+                      onClick={handleExport}
+                      disabled={exporting || candidates.length === 0}
+                      className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {exporting ? <>⏳ Exporting...</> : <>⬇️ Export CSV</>}
+                    </button>
+                  </div>
                 </div>
 
                 {/* ── Export error message — shows below header, above table ── */}
@@ -421,6 +464,13 @@ export default function CandidateRankingPage() {
                               >
                                 ✨ AI Insights
                               </button>
+
+                              <button
+                                onClick={() => setMailTarget(item)}
+                                className="text-xs bg-green-50 text-green-700 px-3 py-1 rounded-lg hover:bg-green-100 transition-colors w-full max-w-[120px] whitespace-nowrap"
+                              >
+                                ✉️ Send Mail
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -458,6 +508,27 @@ export default function CandidateRankingPage() {
 
       {aiTarget && (
         <AiInsightsModal resume={aiTarget} onClose={() => setAiTarget(null)} />
+      )}
+
+      {mailTarget && (
+        <SendMailModal
+          resume={mailTarget}
+          jobTitle={
+            jobDescriptions.find((j) => String(j.id) === String(selectedJob))
+              ?.title ?? ""
+          }
+          onClose={() => setMailTarget(null)}
+        />
+      )}
+
+      {bulkStatus && (
+        <BulkMailModal
+          status={bulkStatus}
+          jobDescriptionId={selectedJob}
+          defaultSubject={bulkSubject}
+          defaultBody={bulkBody}
+          onClose={() => setBulkStatus(null)}
+        />
       )}
     </DashboardLayout>
   );
