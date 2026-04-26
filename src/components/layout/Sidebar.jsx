@@ -173,6 +173,14 @@ export default function Sidebar({ isOpen, onClose }) {
          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
      }`;
 
+  const getRoleLabel = (role) => {
+    const labels = {
+      admin: "Admin",
+      hr: "HR",
+    };
+    return labels[role] ?? role; // fallback to raw role name if not in map
+  };
+
   return (
     <>
       {/* Mobile overlay */}
@@ -273,7 +281,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 {user?.name}
               </p>
               <p className="text-xs text-slate-400 capitalize">
-                {user?.roles?.[0]}
+                {getRoleLabel(user?.roles?.[0])}
               </p>
             </div>
           </div>

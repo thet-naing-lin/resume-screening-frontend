@@ -1,25 +1,33 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/layout/DashboardLayout";
-import { getUsers, assignRole, deleteUser } from "../../api/userApi";
+import {
+  getUsers,
+  assignRole,
+  deleteUser,
+  createUser,
+} from "../../api/userApi";
 import DeleteModal from "../../components/common/DeleteModal";
 
 // ── Helpers ──
 const ROLE_BADGE = {
-  admin: "bg-purple-100 text-purple-700",
-  hr_recruiter: "bg-blue-100   text-blue-700",
-  no_role: "bg-gray-100   text-gray-500",
+  ADMIN: "bg-purple-100 text-purple-700",
+  HR: "bg-blue-100   text-blue-700",
+  NO_ROLE: "bg-gray-100   text-gray-500",
 };
 
 const ROLE_LABEL = {
   admin: "Admin",
-  hr_recruiter: "HR Recruiter",
+  hr: "HR",
   no_role: "No Role",
 };
 
 function RoleBadge({ role }) {
+  const key = role?.toUpperCase() ?? "NO_ROLE";
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${ROLE_BADGE[role] ?? ROLE_BADGE.no_role}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+        ROLE_BADGE[key] ?? ROLE_BADGE.NO_ROLE
+      }`}
     >
       {ROLE_LABEL[role] ?? role}
     </span>
@@ -45,6 +53,16 @@ export default function UserManagement() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [roleLoading, setRoleLoading] = useState(null);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "hr",
+  });
+  const [createLoading, setCreateLoading] = useState(false);
+  const [createError, setCreateError] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -98,18 +116,55 @@ export default function UserManagement() {
     }
   }
 
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreateLoading(true);
+    setCreateError(null);
+    try {
+      const res = await createUser(createForm); // ✅ use the service function
+      setUsers((prev) => [...prev, res.data.user]);
+      setShowCreateModal(false);
+      setCreateForm({ name: "", email: "", password: "", role: "hr" });
+    } catch (err) {
+      setCreateError(err.response?.data?.message || "Failed to create user.");
+    } finally {
+      setCreateLoading(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              User Management
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Manage accounts and assign roles.
-            </p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                User Management
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Manage accounts and assign roles.
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition shadow-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add User
+            </button>
           </div>
 
           {/* Flash */}
@@ -146,7 +201,7 @@ export default function UserManagement() {
             />
             <StatCard
               label="HR Recruiters"
-              value={users.filter((u) => u.role === "HR").length}
+              value={users.filter((u) => u.role === "hr").length}
               color="text-blue-600"
             />
           </div>
@@ -256,6 +311,110 @@ export default function UserManagement() {
           </div>
         </div>
       </div>
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-slate-800 mb-5">
+              Create New User
+            </h2>
+
+            {createError && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                {createError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={createForm.name}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, name: e.target.value })
+                  }
+                  placeholder="John Doe"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={createForm.email}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, email: e.target.value })
+                  }
+                  placeholder="user@company.com"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={8}
+                  value={createForm.password}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, password: e.target.value })
+                  }
+                  placeholder="Min. 8 characters"
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Role
+                </label>
+                <select
+                  value={createForm.role}
+                  onChange={(e) =>
+                    setCreateForm({ ...createForm, role: e.target.value })
+                  }
+                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="hr">HR</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setCreateError(null);
+                  }}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 text-sm font-medium hover:bg-slate-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-sm font-semibold py-2.5 rounded-xl transition"
+                >
+                  {createLoading ? "Creating..." : "Create User"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {deleteTarget && (
         <DeleteModal
