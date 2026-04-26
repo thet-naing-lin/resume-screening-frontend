@@ -56,7 +56,17 @@ export default function ResumeList() {
     try {
       setLoading(true);
       const res = await getResumes();
-      setResumes(res.data.data);
+
+      // console.log("API response:", res.data);
+
+      const raw = res.data?.data ?? res.data ?? [];
+
+      // If it's an object (numeric keys), convert to array
+      const data = Array.isArray(raw) ? raw : Object.values(raw);
+
+      setResumes(data);
+
+      // setResumes(res.data.data);
     } catch (err) {
       setError(err.response?.data?.message ?? "Failed to load resumes.");
     } finally {

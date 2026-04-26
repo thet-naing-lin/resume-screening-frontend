@@ -15,38 +15,9 @@ import CandidateRankingPage from "./pages/candidates/CandidateRankingPage";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import AuditLogsPage from "./pages/admin/AuditLogsPage";
 import ReportsExportPage from "./pages/reports/ReportExportPage";
-
-// const PlaceholderPage = ({ title }) => {
-//   const DashboardLayout =
-//     require("./components/layout/DashboardLayout").default;
-//   return (
-//     <DashboardLayout>
-//       <div className="flex items-center justify-center h-64">
-//         <div className="text-center">
-//           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-//             <svg
-//               className="w-8 h-8 text-blue-400"
-//               fill="none"
-//               stroke="currentColor"
-//               viewBox="0 0 24 24"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth={2}
-//                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-//               />
-//             </svg>
-//           </div>
-//           <h2 className="text-lg font-semibold text-slate-700">{title}</h2>
-//           <p className="text-sm text-slate-400 mt-1">
-//             Coming in the next sprint
-//           </p>
-//         </div>
-//       </div>
-//     </DashboardLayout>
-//   );
-// };
+import GoogleCallback from "./pages/auth/GoogleCallback";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const PlaceholderPage = ({ title }) => (
   <DashboardLayout>
@@ -65,7 +36,10 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* <Route path="/register" element={<Register />} /> */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
 
         {/* Protected */}
         <Route

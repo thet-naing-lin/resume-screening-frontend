@@ -9,6 +9,11 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
+  const params = new URLSearchParams(window.location.search);
+  const googleError = params.get("error");
+
+  const resetSuccess = params.get("reset");
+
   const handleChange = (e) => {
     clearError();
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,6 +25,18 @@ export default function Login() {
     if (result.success) {
       navigate("/dashboard");
     }
+  };
+
+  // Show appropriate message
+  const errorMessages = {
+    google_failed: "Google login failed. Please try again.",
+    not_registered:
+      "Your account is not registered. Please contact admin to get access.", // 🆕
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect browser to Laravel's Google redirect endpoint
+    window.location.href = "http://localhost:8000/auth/google/redirect";
   };
 
   return (
@@ -51,6 +68,26 @@ export default function Login() {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl shadow-slate-200 p-8">
           {/* Error Banner */}
+          {/* {error && (
+            <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              <svg
+                className="w-5 h-5 mt-0.5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )} */}
+
+          {/* Zustand error (normal login) */}
           {error && (
             <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
               <svg
@@ -67,6 +104,34 @@ export default function Login() {
                 />
               </svg>
               <span>{error}</span>
+            </div>
+          )}
+          {/* Google OAuth error (redirected from Laravel) */}
+          {googleError && (
+            <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              <svg
+                className="w-5 h-5 mt-0.5 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>
+                {errorMessages[googleError] ??
+                  "Login failed. Please try again."}
+              </span>
+            </div>
+          )}
+
+          {resetSuccess === "success" && (
+            <div className="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">
+              ✅ Password reset successfully. You can now log in.
             </div>
           )}
 
@@ -91,9 +156,17 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-slate-700">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-blue-600 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -185,10 +258,23 @@ export default function Login() {
                 "Sign In"
               )}
             </button>
+
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-xl px-4 py-2 text-sm hover:bg-gray-50 transition-colors"
+            >
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google"
+                className="w-4 h-4"
+              />
+              Continue with Google
+            </button>
           </form>
 
           {/* Register Link */}
-          <p className="text-center text-sm text-slate-500 mt-6">
+          {/* <p className="text-center text-sm text-slate-500 mt-6">
             Don't have an account?{" "}
             <Link
               to="/register"
@@ -196,14 +282,13 @@ export default function Login() {
             >
               Create account
             </Link>
-          </p>
+          </p> */}
         </div>
 
         {/* Demo credentials hint */}
         <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
           <p className="font-semibold mb-1">Demo Credentials</p>
           <p>Admin: admin@resumescreening.com / Admin@12345</p>
-          {/* <p>HR: hr@resumescreening.com / Hr@12345</p> */}
         </div>
       </div>
     </div>
