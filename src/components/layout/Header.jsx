@@ -24,6 +24,14 @@ export default function Header({ onMenuClick }) {
     navigate("/login");
   };
 
+  const getRoleLabel = (role) => {
+    const labels = {
+      admin: "Admin",
+      hr: "HR",
+    };
+    return labels[role] ?? role; // fallback to raw role name if not in map
+  };
+
   return (
     <header
       className="h-16 bg-white border-b border-slate-100 flex items-center
@@ -71,7 +79,7 @@ export default function Header({ onMenuClick }) {
             {user?.name}
           </span>
           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full capitalize font-medium">
-            {user?.roles?.[0]}
+            {getRoleLabel(user?.roles?.[0])}
           </span>
         </div>
 

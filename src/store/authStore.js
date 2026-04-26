@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { authApi } from "../api/auth";
+import api from "../api/axios";
 
 // stores user + token globally via Zustand
 
@@ -61,6 +62,21 @@ const useAuthStore = create((set) => ({
         : error.response?.data?.message || "Registration failed.";
       set({ error: message, loading: false });
       return { success: false, message };
+    }
+  },
+
+  loginWithToken: async (token) => {
+    localStorage.setItem("token", token);
+    try {
+      const res = await api.get("/auth/me"); // your existing /api/auth/me endpoint
+      const user = res.data.user ?? res.data; // handle both { user: {...} } and direct object
+      localStorage.setItem("user", JSON.stringify(user));
+      set({ user, token, isAuthenticated: true, error: null });
+      return { success: true };
+    } catch {
+      localStorage.removeItem("token");
+      set({ user: null, token: null, isAuthenticated: false });
+      return { success: false };
     }
   },
 
