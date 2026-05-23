@@ -55,8 +55,8 @@ cp .env.example .env
 ### Environment Variables
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000/api
-VITE_GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google
+VITE_API_URL=http://localhost:8000/api
+VITE_GOOGLE_AUTH_URL=http://localhost:8000/api/auth/google/redirect
 ```
 
 ### Running the App

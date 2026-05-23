@@ -7,7 +7,10 @@ export default function Login() {
   const { login, loading, error, clearError } = useAuthStore();
   const apiBaseUrl =
     import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-  const backendBaseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
+  const normalizedApiBaseUrl = apiBaseUrl.replace(/\/$/, "");
+  const googleAuthUrl =
+    import.meta.env.VITE_GOOGLE_AUTH_URL ||
+    `${normalizedApiBaseUrl}/auth/google/redirect`;
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +42,7 @@ export default function Login() {
 
   const handleGoogleLogin = () => {
     // Redirect browser to Laravel's Google redirect endpoint
-    window.location.href = `${backendBaseUrl}/auth/google/redirect`;
+    window.location.href = googleAuthUrl;
   };
 
   return (
