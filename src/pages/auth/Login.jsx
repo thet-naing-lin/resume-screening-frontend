@@ -5,6 +5,9 @@ import useAuthStore from "../../store/authStore";
 export default function Login() {
   const navigate = useNavigate();
   const { login, loading, error, clearError } = useAuthStore();
+  const apiBaseUrl =
+    import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+  const backendBaseUrl = apiBaseUrl.replace(/\/api\/?$/, "");
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +39,7 @@ export default function Login() {
 
   const handleGoogleLogin = () => {
     // Redirect browser to Laravel's Google redirect endpoint
-    window.location.href = "http://localhost:8000/auth/google/redirect";
+    window.location.href = `${backendBaseUrl}/auth/google/redirect`;
   };
 
   return (
