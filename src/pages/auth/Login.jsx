@@ -8,9 +8,15 @@ export default function Login() {
   const apiBaseUrl =
     import.meta.env.VITE_API_URL || "http://localhost:8000/api";
   const normalizedApiBaseUrl = apiBaseUrl.replace(/\/$/, "");
+  const backendBaseUrl = normalizedApiBaseUrl.replace(/\/api\/?$/, "");
   const googleAuthUrl =
     import.meta.env.VITE_GOOGLE_AUTH_URL ||
-    `${normalizedApiBaseUrl}/auth/google/redirect`;
+    `${backendBaseUrl}/auth/google/redirect`;
+
+  console.log("Using Google Auth URL:", googleAuthUrl); // Debug log
+  console.log("API Base URL:", apiBaseUrl); // Debug log
+  console.log("Backend Base URL:", backendBaseUrl); // Debug log
+  console.log(normalizedApiBaseUrl);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
