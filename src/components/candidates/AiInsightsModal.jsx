@@ -134,6 +134,13 @@ export default function AiInsightsModal({ resume, onClose }) {
                   </p>
                 </div>
               )}
+
+              <div className="bg-amber-50 border border-amber-200 text-center rounded-xl px-4 py-3">
+                <p className="text-xs sm:text-sm text-amber-800 font-medium">
+                  AI-generated content: Use as decision support only. Human
+                  verification is required before any hiring decision.
+                </p>
+              </div>
             </>
           )}
         </div>
