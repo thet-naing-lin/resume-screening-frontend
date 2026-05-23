@@ -149,7 +149,7 @@ export default function CreateJob() {
                 onChange={handleChange}
                 rows={5}
                 placeholder="Describe the role, responsibilities..."
-                className={`${inputClass("description")} resize-none`}
+                className={`${inputClass("description")} resize-y min-h-[140px] max-h-[420px] overflow-y-auto`}
               />
               <p className="text-xs text-gray-400 mt-1 text-right">
                 {form.description.length} characters
