@@ -13,10 +13,10 @@ export default function Login() {
     import.meta.env.VITE_GOOGLE_AUTH_URL ||
     `${backendBaseUrl}/auth/google/redirect`;
 
-  console.log("Using Google Auth URL:", googleAuthUrl); // Debug log
-  console.log("API Base URL:", apiBaseUrl); // Debug log
-  console.log("Backend Base URL:", backendBaseUrl); // Debug log
-  console.log(normalizedApiBaseUrl);
+  // console.log("Using Google Auth URL:", googleAuthUrl); // Debug log
+  // console.log("API Base URL:", apiBaseUrl); // Debug log
+  // console.log("Backend Base URL:", backendBaseUrl); // Debug log
+  // console.log(normalizedApiBaseUrl);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
